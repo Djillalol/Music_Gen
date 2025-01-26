@@ -5,19 +5,19 @@ import json
 import tensorflow.keras as keras
 import music21 as m21
 
-# Define constants
-MAPPING_PATH = "mapping.json"  # Update path if necessary
+MAPPING_PATH = "perfectmap.json"  
 SEQUENCE_LENGTH = 64
+MODEL_PATH = "perfect.h5"
 
-def load_mappings():
-    with open(MAPPING_PATH, "r") as fp:
-        return json.load(fp)
 
 class Generator:
-    def __init__(self, model_path="model.h5"):
+    def __init__(self, model_path=MODEL_PATH):
         self.model_path = model_path
         self.model = keras.models.load_model(model_path)
-        self._mappings = load_mappings()
+        
+        with open(MAPPING_PATH, "r") as fp:
+            self._mappings = json.load(fp)
+
         self._start_symbols = ["/"] * SEQUENCE_LENGTH
 
     def generate_song(self, seed, num_steps, max_sequence_length, temperature):
@@ -80,7 +80,7 @@ def generate_random_seed():
     return " ".join([note + (" _" if i % 2 == 0 else "") for i, note in enumerate(notes)])
 
 # Initialize the generator
-model_path = "model.h5"  # Adjust if necessary
+model_path = "perfect.h5"  # Adjust if necessary
 mg = Generator(model_path)
 
 # Interface: Random Seed Generation
@@ -95,7 +95,7 @@ st.text_area("Generated Seed", seed, height=68)
 
 # Parameters
 num_steps = st.slider("Number of Steps", 100, 500, 300)
-temperature = st.slider("Temperature", 0.5, 2.0, 1.0)
+temperature = st.slider("Temperature", 0.1, 2.0, 1.0)
 
 # Generate Music
 if st.button("Generate Music"):
